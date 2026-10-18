@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Florida Pool Co.
 
-## Getting Started
+Site em React, TypeScript e Next.js (App Router), convertido de `example/index.html`, preservando o conteúdo, as imagens e os estilos da referência.
 
-First, run the development server:
+## Executar
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run lint
+npm test
+npx tsc --noEmit
+npm run build
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Rotas
 
-## Learn More
+| Página | Rota |
+| --- | --- |
+| Início | `/` |
+| Serviços | `/services` |
+| Limpeza semanal | `/weekly` |
+| Recuperação de piscinas verdes | `/green` |
+| Reparo de equipamentos | `/equipment` |
+| Reforma de piscinas | `/remodeling` |
+| Galeria de piscinas | `/gallery` |
+| Áreas atendidas | `/areas` |
+| Coral Springs | `/coral-springs` |
+| Boca Raton | `/boca-raton` |
+| Deerfield Beach | `/deerfield` |
+| Lighthouse Point | `/lighthouse` |
+| Parkland | `/parkland` |
+| Fort Lauderdale | `/fort-lauderdale` |
+| Sobre | `/about` |
+| Avaliações | `/reviews` |
+| Contato | `/contact` |
 
-To learn more about Next.js, take a look at the following resources:
+Cada página possui seu próprio `app/.../page.tsx`. O layout raiz compartilha o cabeçalho, o rodapé, a barra móvel de contato e os dados estruturados da empresa. Os componentes interativos estão em `components/`: menu móvel, acordeões e formulários. Os ícones são compartilhados em `components/icon.tsx`, e as imagens extraídas do HTML estão em `public/images/`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Formulários e Resend
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Os três formulários enviam para `POST /api/contact`, que valida os dados e envia uma notificação à equipe pela [API do Resend](https://resend.com/docs/api-reference/emails/send-email). A resposta de sucesso só é retornada depois de o provedor aceitar o envio. O endereço informado pelo visitante é usado em `reply_to`, quando preenchido.
 
-## Deploy on Vercel
+Configure no `.env` local e nas variáveis do ambiente de hospedagem:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```dotenv
+RESEND_API_KEY=sua_chave_do_resend
+RESEND_FROM="Florida Pool Co. <remetente@seu-dominio.com>"
+# Opcional: por padrão, as solicitações vão para contact@floridapoolco.com.
+RESEND_TO=contact@floridapoolco.com
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`RESEND_FROM` deve usar um remetente autorizado no Resend. As credenciais ficam no servidor e os arquivos `.env` são ignorados pelo Git. Reinicie o servidor após alterar as variáveis.
+
+O endpoint preserva `source`, `consent`, `website` (honeypot) e `requestId`. Os reenvios usam a mesma chave de idempotência para evitar notificações duplicadas. Há validação dos campos, limite de tamanho e timeout; erros do provedor não expõem credenciais ou dados dos clientes.
+
+`npm test` cobre os três formulários, destinatário configurável, dados inválidos, spam, reenvios, configuração ausente e falhas do provedor. Os testes interceptam o envio e não fazem chamadas reais ao Resend.
+
+As fontes originais são carregadas do Google Fonts no navegador; o build não depende de baixá-las.
+# Florida-Pool-Website
